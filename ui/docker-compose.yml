@@ -1,0 +1,6 @@
+frontend:
+  build:
+    context: ./ui
+    dockerfile: Dockerfile
+  ports:
+    - "3000:80"

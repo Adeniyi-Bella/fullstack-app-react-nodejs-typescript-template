@@ -1,0 +1,65 @@
+src/routeTree.gen.ts
+# =========================
+# Dependencies
+# =========================
+node_modules
+.pnpm-store
+
+# =========================
+# Build Outputs (API & UI)
+# =========================
+dist
+build
+out
+coverage
+
+# =========================
+# Environment Variables (Secrets)
+# =========================
+# Ignore all .env files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Exception: Always commit example files!
+!.env.example
+!.env.sample
+
+# =========================
+# Logs & Debugging
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# OS & IDE Files
+# =========================
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.swp
+*.swo
+
+# =========================
+# Testing
+# =========================
+.nyc_output
+junit.xml
+
+# =========================
+# Optional: Specific to your stack
+# =========================
+# If you have file uploads in API
+api/uploads/*
+!api/uploads/.gitkeep
+
+# ESLint cache
+.eslintcache

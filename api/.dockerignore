@@ -1,0 +1,27 @@
+# Node modules & dependencies (we rebuild in image)
+node_modules
+npm-debug.log
+
+# Logs
+logs
+*.log
+*.tsbuildinfo
+
+# Env files (use docker-compose/env instead)
+.env
+.env.local
+.env.test
+.env.production
+
+# Build output (we copy from builder stage)
+dist
+
+# Git
+.git
+.gitignore
+
+# OS / IDE files
+.DS_Store
+.vscode
+.idea
+*.swp
