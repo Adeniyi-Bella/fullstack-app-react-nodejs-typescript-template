@@ -1,5 +1,5 @@
 {
-  "name": "admina_backend",
+  "name": "fullstack-api",
   "version": "1.0.0",
   "description": "Enterprise-grade Node.js API with TypeScript",
   "main": "dist/server.js",
