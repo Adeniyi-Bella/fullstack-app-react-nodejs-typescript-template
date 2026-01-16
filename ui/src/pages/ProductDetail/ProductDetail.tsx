@@ -1,14 +1,16 @@
-import { memo, useCallback } from 'react';
-import { useNavigate, useParams } from '@tanstack/react-router';
-import { Card } from '@components/common/Card/Card';
-import { Button } from '@components/common/Button/Button';
-import { Loading } from '@components/common/Loading/Loading';
-import { useProduct, useDeleteProduct } from '@hooks/api/useProducts';
-import { useCartStore } from '@store/cart.store';
-import { Formatters } from '@lib/utils/formatters';
+import { memo, useCallback } from "react";
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import { Card } from "@components/common/Card/Card";
+import { Button } from "@components/common/Button/Button";
+import { Loading } from "@components/common/Loading/Loading";
+import { useProduct, useDeleteProduct } from "@hooks/api/useProducts";
+import { useCartStore } from "@store/cart.store";
+import { Formatters } from "@lib/utils/formatters";
 
 export const ProductDetail = memo(() => {
-  const { productId } = useParams({ from: '/_authenticated/products/$productId' });
+  const { productId } = useParams({
+    from: "/_authenticated/products/$productId",
+  });
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
 
@@ -28,11 +30,11 @@ export const ProductDetail = memo(() => {
 
   const handleDelete = useCallback(() => {
     if (!product) return;
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm("Are you sure you want to delete this product?")) return;
 
     deleteProduct(product.productId, {
       onSuccess: () => {
-        navigate({ to: '/products' });
+        navigate({ to: "/products" });
       },
     });
   }, [product, deleteProduct, navigate]);
@@ -57,9 +59,9 @@ export const ProductDetail = memo(() => {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-600">
-        <a href="/products" className="hover:text-gray-900">
+        <Link to="/products" className="hover:text-gray-900">
           Products
-        </a>
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-gray-900">{product.name}</span>
       </nav>
@@ -78,7 +80,9 @@ export const ProductDetail = memo(() => {
           {/* Details */}
           <div className="space-y-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {product.name}
+              </h1>
               <p className="text-sm text-gray-500 mt-1 capitalize">
                 {product.category}
               </p>
@@ -99,7 +103,9 @@ export const ProductDetail = memo(() => {
                 <span className="text-gray-600">Status:</span>
                 <span
                   className={`font-medium capitalize ${
-                    product.status === 'active' ? 'text-green-600' : 'text-red-600'
+                    product.status === "active"
+                      ? "text-green-600"
+                      : "text-red-600"
                   }`}
                 >
                   {product.status}
@@ -135,4 +141,4 @@ export const ProductDetail = memo(() => {
   );
 });
 
-ProductDetail.displayName = 'ProductDetail';
+ProductDetail.displayName = "ProductDetail";

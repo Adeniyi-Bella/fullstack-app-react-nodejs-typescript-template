@@ -1,27 +1,32 @@
-import { memo, useCallback } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { Card } from '@components/common/Card/Card';
-import { Button } from '@components/common/Button/Button';
-import { Loading } from '@components/common/Loading/Loading';
-import { Formatters } from '@lib/utils/formatters';
-import { useCancelOrder, useOrder, useUpdateOrderStatus } from '@/hooks/api/useOrder';
-import { OrderStatus } from '@/types';
+import { memo, useCallback } from "react";
+import { useParams, useNavigate, Link } from "@tanstack/react-router";
+import { Card } from "@components/common/Card/Card";
+import { Button } from "@components/common/Button/Button";
+import { Loading } from "@components/common/Loading/Loading";
+import { Formatters } from "@lib/utils/formatters";
+import {
+  useCancelOrder,
+  useOrder,
+  useUpdateOrderStatus,
+} from "@/hooks/api/useOrder";
+import { OrderStatus } from "@/types";
 
 export const OrderDetail = memo(() => {
-  const { orderId } = useParams({ from: '/_authenticated/orders/$orderId' });
+  const { orderId } = useParams({ from: "/_authenticated/orders/$orderId" });
   const navigate = useNavigate();
 
   const { data: order, isLoading, error } = useOrder(orderId);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
-  const { mutate: updateStatus, isPending: isUpdating } = useUpdateOrderStatus();
+  const { mutate: updateStatus, isPending: isUpdating } =
+    useUpdateOrderStatus();
 
   const handleCancel = useCallback(() => {
     if (!order) return;
-    if (!confirm('Are you sure you want to cancel this order?')) return;
+    if (!confirm("Are you sure you want to cancel this order?")) return;
 
     cancelOrder(order.orderId, {
       onSuccess: () => {
-        navigate({ to: '/orders' });
+        navigate({ to: "/orders" });
       },
     });
   }, [order, cancelOrder, navigate]);
@@ -44,13 +49,13 @@ export const OrderDetail = memo(() => {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      processing: 'bg-blue-100 text-blue-800 border-blue-200',
-      shipped: 'bg-purple-100 text-purple-800 border-purple-200',
-      delivered: 'bg-green-100 text-green-800 border-green-200',
-      cancelled: 'bg-red-100 text-red-800 border-red-200',
+      pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      processing: "bg-blue-100 text-blue-800 border-blue-200",
+      shipped: "bg-purple-100 text-purple-800 border-purple-200",
+      delivered: "bg-green-100 text-green-800 border-green-200",
+      cancelled: "bg-red-100 text-red-800 border-red-200",
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
 
   if (isLoading) {
@@ -73,9 +78,9 @@ export const OrderDetail = memo(() => {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-600">
-        <a href="/orders" className="hover:text-gray-900">
+        <Link to="/orders" className="hover:text-gray-900">
           Orders
-        </a>
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-gray-900">#{order.orderId.slice(0, 8)}</span>
       </nav>
@@ -88,7 +93,7 @@ export const OrderDetail = memo(() => {
               Order #{order.orderId.slice(0, 8)}
             </h1>
             <p className="text-gray-600 mt-1">
-              Placed on {Formatters.date(order.createdAt || new Date(), 'long')}
+              Placed on {Formatters.date(order.createdAt || new Date(), "long")}
             </p>
           </div>
           <span
@@ -110,8 +115,12 @@ export const OrderDetail = memo(() => {
                 className="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
               >
                 <div>
-                  <p className="font-medium text-gray-900">Product ID: {item.productId}</p>
-                  <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                  <p className="font-medium text-gray-900">
+                    Product ID: {item.productId}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Quantity: {item.quantity}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-gray-900">
@@ -195,4 +204,4 @@ export const OrderDetail = memo(() => {
   );
 });
 
-OrderDetail.displayName = 'OrderDetail';
+OrderDetail.displayName = "OrderDetail";

@@ -1,12 +1,12 @@
-import { memo, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@components/common/Button/Button';
-import { Input } from '@components/common/Input/Input';
-import { Card } from '@components/common/Card/Card';
-import { useRegister } from '@hooks/api/useAuth';
-import { Helpers } from '@lib/utils/helpers';
-import type { RegisterData } from '@/types';
+import { memo, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Button } from "@components/common/Button/Button";
+import { Input } from "@components/common/Input/Input";
+import { Card } from "@components/common/Card/Card";
+import { useRegister } from "@hooks/api/useAuth";
+import { Helpers } from "@lib/utils/helpers";
+import type { RegisterData } from "@/types";
 
 export const Register = memo(() => {
   const navigate = useNavigate();
@@ -22,12 +22,12 @@ export const Register = memo(() => {
     (data: RegisterData) => {
       // Generate a unique userId
       const userId = Helpers.generateId();
-      
+
       register(
         { ...data, userId },
         {
           onSuccess: () => {
-            navigate({ to: '/dashboard' });
+            navigate({ to: "/dashboard" });
           },
         }
       );
@@ -48,11 +48,11 @@ export const Register = memo(() => {
             label="Username"
             placeholder="johndoe"
             error={errors.username?.message}
-            {...formRegister('username', {
-              required: 'Username is required',
+            {...formRegister("username", {
+              required: "Username is required",
               minLength: {
                 value: 3,
-                message: 'Username must be at least 3 characters',
+                message: "Username must be at least 3 characters",
               },
             })}
           />
@@ -62,11 +62,11 @@ export const Register = memo(() => {
             type="email"
             placeholder="you@example.com"
             error={errors.email?.message}
-            {...formRegister('email', {
-              required: 'Email is required',
+            {...formRegister("email", {
+              required: "Email is required",
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Invalid email address',
+                message: "Invalid email address",
               },
             })}
           />
@@ -76,11 +76,11 @@ export const Register = memo(() => {
             type="password"
             placeholder="••••••••"
             error={errors.password?.message}
-            {...formRegister('password', {
-              required: 'Password is required',
+            {...formRegister("password", {
+              required: "Password is required",
               minLength: {
                 value: 8,
-                message: 'Password must be at least 8 characters',
+                message: "Password must be at least 8 characters",
               },
             })}
           />
@@ -91,17 +91,25 @@ export const Register = memo(() => {
             </div>
           )}
 
-          <Button type="submit" isLoading={isPending} variant='secondary' fullWidth>
+          <Button
+            type="submit"
+            isLoading={isPending}
+            variant="secondary"
+            fullWidth
+          >
             Create Account
           </Button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <a href="/login" className="text-primary-600 hover:text-primary-700">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-primary-600 hover:text-primary-700"
+            >
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </Card>
@@ -109,4 +117,4 @@ export const Register = memo(() => {
   );
 });
 
-Register.displayName = 'Register';
+Register.displayName = "Register";

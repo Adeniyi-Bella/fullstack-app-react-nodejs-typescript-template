@@ -1,6 +1,6 @@
-import { memo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@components/common/Button/Button';
+import { memo } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Button } from "@components/common/Button/Button";
 
 export const NotFound = memo(() => {
   const navigate = useNavigate();
@@ -19,13 +19,16 @@ export const NotFound = memo(() => {
           Page Not Found
         </h2>
         <p className="text-gray-600 mb-8 max-w-md mx-auto">
-          Sorry, we couldn't find the page you're looking for. The page might have been
-          moved, deleted, or never existed.
+          Sorry, we couldn't find the page you're looking for. The page might
+          have been moved, deleted, or never existed.
         </p>
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button variant="primary" onClick={() => navigate({ to: '/dashboard' })}>
+          <Button
+            variant="primary"
+            onClick={() => navigate({ to: "/dashboard" })}
+          >
             Go to Dashboard
           </Button>
           <Button variant="secondary" onClick={() => window.history.back()}>
@@ -35,26 +38,28 @@ export const NotFound = memo(() => {
 
         {/* Helpful Links */}
         <div className="mt-12">
-          <p className="text-sm text-gray-500 mb-4">Here are some helpful links:</p>
+          <p className="text-sm text-gray-500 mb-4">
+            Here are some helpful links:
+          </p>
           <div className="flex flex-wrap gap-4 justify-center text-sm">
-            <a
-              href="/products"
+            <Link
+              to="/products"
               className="text-primary-600 hover:text-primary-700 hover:underline"
             >
               Browse Products
-            </a>
-            <a
-              href="/orders"
+            </Link>
+            <Link
+              to="/orders"
               className="text-primary-600 hover:text-primary-700 hover:underline"
             >
               View Orders
-            </a>
-            <a
-              href="/dashboard"
+            </Link>
+            <Link
+              to="/dashboard"
               className="text-primary-600 hover:text-primary-700 hover:underline"
             >
               Dashboard
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -62,4 +67,4 @@ export const NotFound = memo(() => {
   );
 });
 
-NotFound.displayName = 'NotFound';
+NotFound.displayName = "NotFound";
