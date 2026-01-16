@@ -60,7 +60,7 @@ export const Sidebar = memo<SidebarProps>(({ className }) => {
   return (
     <aside
       className={Helpers.cn(
-        'w-64 bg-white border-r border-gray-200 min-h-screen',
+        'w-64 bg-white border-r border-gray-200',
         className
       )}
     >
