@@ -19,7 +19,7 @@ export const Icon = memo(
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={Helpers.cn('inline-block', className)}
+          className={Helpers.cn('inline-block hover:cursor-pointer', className)}
           aria-hidden="true"
           {...props}
         >
