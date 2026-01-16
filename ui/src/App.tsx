@@ -1,9 +1,7 @@
-import { memo, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { ErrorBoundary } from '@components/common/ErrorBoundary/ErrorBoundary';
-import { SentryLogger } from '@lib/logger/sentry';
 import { routeTree } from './routeTree.gen';
 
 // Create a query client with optimized defaults
@@ -35,11 +33,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-export const App = memo(() => {
-  useEffect(() => {
-    // Initialize Sentry logging
-    SentryLogger.init();
-  }, []);
+export const App = () => {
 
   return (
     <ErrorBoundary>
@@ -49,6 +43,6 @@ export const App = memo(() => {
       </QueryClientProvider>
     </ErrorBoundary>
   );
-});
+};
 
 App.displayName = 'App';
