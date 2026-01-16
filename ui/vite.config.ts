@@ -8,10 +8,8 @@ import path from "path";
 export default defineConfig({
   plugins: [
     tanstackRouter({
-      routesDirectory: "./src/routes",
-      generatedRouteTree: "./src/routeTree.gen.ts",
-      routeFileIgnorePrefix: "-",
-      quoteStyle: "single",
+      target: 'react',
+      autoCodeSplitting: true,
     }),
 
     react(),
