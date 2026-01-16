@@ -1,6 +1,5 @@
 import { memo, type ReactNode } from 'react';
 import { Header } from '../Header/Header';
-import { Footer } from '../Footer/Footer';
 import { Sidebar } from '../Sidebar/Sidebar';
 import { useUIStore } from '@store/ui.store';
 
@@ -20,7 +19,6 @@ export const MainLayout = memo<MainLayoutProps>(({ children }) => {
           <div className="container mx-auto px-4 py-8">{children}</div>
         </main>
       </div>
-      <Footer />
     </div>
   );
 });

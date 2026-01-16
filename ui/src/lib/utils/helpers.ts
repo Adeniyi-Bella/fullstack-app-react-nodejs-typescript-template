@@ -3,9 +3,9 @@ export class Helpers {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  static sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+  // static sleep(ms: number): Promise<void> {
+  //   return new Promise((resolve) => setTimeout(resolve, ms));
+  // }
 
   static cn(...classes: (string | undefined | null | false)[]): string {
     return classes.filter(Boolean).join(' ');
