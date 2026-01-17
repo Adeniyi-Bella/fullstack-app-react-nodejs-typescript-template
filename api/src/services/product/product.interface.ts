@@ -1,18 +1,18 @@
-import { ProductDTO, CreateProductDTO, UpdateProductDTO, PaginatedResponse } from '@/types';
+import { IProductData, CreateProductDTO, UpdateProductDTO, PaginatedResponse } from '@/types';
 
 export interface IProductService {
-  createProduct(userId: string, data: CreateProductDTO): Promise<ProductDTO>;
-  getProductById(productId: string): Promise<ProductDTO | null>;
+  createProduct(userId: string, data: CreateProductDTO): Promise<IProductData>;
+  getProductById(productId: string): Promise<IProductData | null>;
   getUserProducts(
     userId: string,
     limit: number,
     offset: number
-  ): Promise<PaginatedResponse<ProductDTO>>;
+  ): Promise<PaginatedResponse<IProductData>>;
   updateProduct(
     userId: string,
     productId: string,
     data: UpdateProductDTO
-  ): Promise<ProductDTO | null>;
+  ): Promise<IProductData | null>;
   deleteProduct(userId: string, productId: string): Promise<boolean>;
   decrementStock(productId: string, quantity: number): Promise<boolean>;
 }

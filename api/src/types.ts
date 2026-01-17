@@ -32,6 +32,13 @@ export type ApiSuccessResponse<T> = {
   version: string;
 };
 
+export interface ApiErrorResponse {
+  status: 'error';
+  code: string;
+  message: string;
+  errors?: Record<string, unknown>;
+}
+
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
@@ -89,17 +96,11 @@ export enum OrderStatus {
   RETURNED = 'returned',
 }
 
-export interface OrderItem {
-  productId: string;
-  quantity: number;
-  price: number;
-  name?: string; 
-}
-
 export interface IProductData {
   productId: string;
   name: string;
   description: string;
+  quantity: number;
   price: number;
   category: ProductCategory;
   stock: number;
@@ -109,7 +110,7 @@ export interface IProductData {
   updatedAt: Date;
 }
 
-export type ProductDTO = IProductData;
+export type OrderItem = Pick<IProductData, 'productId' | 'name' | 'price'| "quantity">;
 
 export type CreateProductDTO = Pick<
   IProductData,
@@ -131,16 +132,6 @@ export interface IOrderData {
   updatedAt: Date;
 }
 
-export type OrderDTO = IOrderData;
-
-export interface CreateOrderDTO {
-  items: {
-    productId: string;
-    quantity: number;
-  }[];
-  shippingAddress: string;
-}
-
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
@@ -150,3 +141,9 @@ export interface PaginatedResponse<T> {
     hasMore: boolean;
   };
 }
+
+export type CreateOrderDTO = Pick<IOrderData, 'items' | 'shippingAddress'>;
+
+export type OrderParams = Pick<IOrderData, 'orderId'>;
+
+export type UpdateStatusDTO = Pick<IOrderData, 'status'>;

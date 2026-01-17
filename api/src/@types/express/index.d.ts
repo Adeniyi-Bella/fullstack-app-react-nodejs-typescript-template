@@ -3,15 +3,8 @@
  * @license Apache-2.0
  */
 
-/**
- * Node modules
- */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as express from 'express';
-
-/**
- * Types
- */
-import { Types } from 'mongoose';
 
 declare global {
   namespace Express {

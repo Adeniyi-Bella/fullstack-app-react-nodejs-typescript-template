@@ -1,9 +1,15 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { body, param } from 'express-validator';
 import authenticate from '@/middlewares/authenticate';
 import validationError from '@/middlewares/validationError';
 import resetMonthlyLimits from '@/middlewares/resetMonthlyLimits';
-import { cancelOrder, createOrder, getOrder, getUserOrders, updateOrderStatus } from '@/controllers/controller/order.controller';
+import {
+  cancelOrder,
+  createOrder,
+  getOrder,
+  getUserOrders,
+  updateOrderStatus,
+} from '@/controllers/controller/order.controller';
 
 const router = Router();
 
@@ -44,10 +50,14 @@ router.patch(
   '/:orderId/status',
   param('orderId').isString().notEmpty(),
   body('status')
+    .isString()
+    .withMessage('Status has to be string data type')
+    .notEmpty()
+    .withMessage('Status is required')
     .isIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
     .withMessage('Invalid order status'),
   validationError,
-  updateOrderStatus
+  updateOrderStatus as RequestHandler<unknown, unknown, { status: string }>
 );
 
 router.post(

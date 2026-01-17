@@ -5,9 +5,10 @@ import { IProductService } from '@/services/product/product.interface';
 import { IUserService } from '@/services/users/user.interface';
 import { ApiResponse } from '@/lib/api_response/success';
 import { NotFoundError } from '@/lib/api_response/error';
+import { CreateProductDTO, UpdateProductDTO } from '@/types';
 
 export const createProduct = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
+  async (req: Request<unknown, unknown, CreateProductDTO>, res: Response): Promise<void> => {
     const productService =
       container.resolve<IProductService>('IProductService');
     const userService = container.resolve<IUserService>('IUserService');
@@ -55,7 +56,7 @@ export const getUserProducts = asyncHandler(
 );
 
 export const updateProduct = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
+  async (req: Request<{ productId: string }, unknown, UpdateProductDTO>, res: Response): Promise<void> => {
     const productService =
       container.resolve<IProductService>('IProductService');
     const { productId } = req.params;

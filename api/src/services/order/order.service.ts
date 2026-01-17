@@ -4,7 +4,7 @@ import Order, { IOrder } from '@/models/order.model';
 import { IOrderService } from './order.interface';
 import { IProductService } from '@/services/product/product.interface';
 import {
-  OrderDTO,
+  IOrderData,
   CreateOrderDTO,
   PaginatedResponse,
   OrderStatus,
@@ -22,7 +22,7 @@ import mongoose from 'mongoose';
 
 @injectable()
 export class OrderService implements IOrderService {
-  private mapToDTO(order: IOrder): OrderDTO {
+  private mapToDTO(order: IOrder): IOrderData {
     return {
       orderId: order.orderId,
       userId: order.userId,
@@ -35,7 +35,7 @@ export class OrderService implements IOrderService {
     };
   }
 
-  async createOrder(userId: string, data: CreateOrderDTO): Promise<OrderDTO> {
+  async createOrder(userId: string, data: CreateOrderDTO): Promise<IOrderData> {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -113,15 +113,15 @@ export class OrderService implements IOrderService {
 
       throw new DatabaseError('Failed to create order');
     } finally {
-      session.endSession();
+      await session.endSession();
     }
   }
 
-  async getOrderById(orderId: string): Promise<OrderDTO | null> {
+  async getOrderById(orderId: string): Promise<IOrderData | null> {
     try {
       const order = await Order.findOne({ orderId })
         .select('-__v')
-        .lean<OrderDTO>()
+        .lean<IOrderData>()
         .exec();
 
       if (!order) return null;
@@ -137,7 +137,7 @@ export class OrderService implements IOrderService {
     userId: string,
     limit: number,
     offset: number
-  ): Promise<PaginatedResponse<OrderDTO>> {
+  ): Promise<PaginatedResponse<IOrderData>> {
     try {
       const [orders, total] = await Promise.all([
         Order.find({ userId })
@@ -145,7 +145,7 @@ export class OrderService implements IOrderService {
           .limit(limit)
           .skip(offset)
           .select('-__v')
-          .lean<OrderDTO[]>()
+          .lean<IOrderData[]>()
           .exec(),
         Order.countDocuments({ userId }).exec(),
       ]);
@@ -168,7 +168,7 @@ export class OrderService implements IOrderService {
   async updateOrderStatus(
     orderId: string,
     status: OrderStatus
-  ): Promise<OrderDTO | null> {
+  ): Promise<IOrderData | null> {
     try {
       const order = await Order.findOne({ orderId }).exec();
 
@@ -258,7 +258,7 @@ export class OrderService implements IOrderService {
       logger.error('Error cancelling order', { orderId, userId, error });
       throw new DatabaseError('Failed to cancel order');
     } finally {
-      session.endSession();
+      await session.endSession();
     }
   }
 }

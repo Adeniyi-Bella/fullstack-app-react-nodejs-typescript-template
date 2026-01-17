@@ -5,9 +5,11 @@ import { IOrderService } from '@/services/order/order.interface';
 import { NotFoundError } from '@/lib/api_response/error';
 import { IUserService } from '@/services/users/user.interface';
 import { ApiResponse } from '@/lib/api_response/success';
+import { CreateOrderDTO, OrderParams, UpdateStatusDTO } from '@/types';
+
 
 export const createOrder = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
+  async (req: Request<unknown, unknown, CreateOrderDTO>, res: Response): Promise<void> => {
     const orderService = container.resolve<IOrderService>('IOrderService');
     const userService = container.resolve<IUserService>('IUserService');
 
@@ -53,9 +55,14 @@ export const getUserOrders = asyncHandler(
 );
 
 export const updateOrderStatus = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
+  async (
+    req: Request<OrderParams, unknown, UpdateStatusDTO>, 
+    res: Response
+  ): Promise<void> => {
     const orderService = container.resolve<IOrderService>('IOrderService');
-    const { orderId } = req.params;
+    
+    const { orderId } = req.params; 
+    
     const { status } = req.body;
 
     const order = await orderService.updateOrderStatus(orderId, status);

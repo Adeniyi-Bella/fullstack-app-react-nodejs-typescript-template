@@ -1,16 +1,16 @@
-import { OrderDTO, CreateOrderDTO, PaginatedResponse, OrderStatus } from '@/types';
+import { IOrderData, CreateOrderDTO, PaginatedResponse, OrderStatus } from '@/types';
 
 export interface IOrderService {
-  createOrder(userId: string, data: CreateOrderDTO): Promise<OrderDTO>;
-  getOrderById(orderId: string): Promise<OrderDTO | null>;
+  createOrder(userId: string, data: CreateOrderDTO): Promise<IOrderData>;
+  getOrderById(orderId: string): Promise<IOrderData | null>;
   getUserOrders(
     userId: string,
     limit: number,
     offset: number
-  ): Promise<PaginatedResponse<OrderDTO>>;
+  ): Promise<PaginatedResponse<IOrderData>>;
   updateOrderStatus(
     orderId: string,
     status: OrderStatus
-  ): Promise<OrderDTO | null>;
+  ): Promise<IOrderData | null>;
   cancelOrder(userId: string, orderId: string): Promise<boolean>;
 }

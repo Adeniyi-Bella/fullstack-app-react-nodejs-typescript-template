@@ -1,34 +1,24 @@
 import 'reflect-metadata';
-import Order from '@/models/order.model';
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import Order, { IOrder } from '@/models/order.model';
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '@/app';
-import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
 import User from '@/models/user.model';
 import Product from '@/models/product.model';
-import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { generateAccessToken } from '@/lib/jwt';
-import mongoose from 'mongoose';
+import { ApiErrorResponse, ApiSuccessResponse } from '@/types';
 
 describe('Order API Integration Tests', () => {
-  let mongoServer: MongoMemoryReplSet;
   let authToken: string;
   let userId: string;
   let productId: string;
   let createdOrderId: string;
 
   beforeAll(async () => {
-    await mongoose.disconnect();
 
-    mongoServer = await MongoMemoryReplSet.create({
-      replSet: {
-        count: 1,
-        storageEngine: 'wiredTiger',
-      },
-    });
-    const uri = mongoServer.getUri();
-
-    await mongoose.connect(uri);
+    await User.createCollection();
+    await Product.createCollection();
+    await Order.createCollection();
 
     // Create test user
     const testUser = await User.create({
@@ -61,13 +51,6 @@ describe('Order API Integration Tests', () => {
     productId = testProduct.productId;
   });
 
-  afterAll(async () => {
-    await mongoose.disconnect();
-    if (mongoServer) {
-      await mongoServer.stop();
-    }
-  });
-
   beforeEach(async () => {
     await Order.deleteMany({ userId });
     await Product.updateOne({ productId }, { $set: { stock: 100 } });
@@ -87,17 +70,19 @@ describe('Order API Integration Tests', () => {
           ],
           shippingAddress: '123 Test Street, Test City, TS 12345',
         });
+        
+      const body = response.body as ApiSuccessResponse<{ order: IOrder }>;
 
       expect(response.status).toBe(201);
-      expect(response.body.status).toBe('success');
-      expect(response.body.data.order).toHaveProperty('orderId');
-      expect(response.body.data.order.totalAmount).toBe(199.98); // 99.99 * 2
-      expect(response.body.data.order.items).toHaveLength(1);
-      expect(response.body.data.order.status).toBe('pending');
+      expect(body.status).toBe('success');
+      expect(body.data?.order).toHaveProperty('orderId');
+      expect(body.data?.order.totalAmount).toBe(199.98);
+      expect(body.data?.order.items).toHaveLength(1);
+      expect(body.data?.order.status).toBe('pending');
+      if (body.data?.order) {
+        createdOrderId = body.data.order.orderId;
+      }
 
-      createdOrderId = response.body.data.order.orderId;
-
-      // Verify stock was decremented
       const product = await Product.findOne({ productId });
       expect(product?.stock).toBe(98);
     });
@@ -116,8 +101,9 @@ describe('Order API Integration Tests', () => {
           shippingAddress: '123 Test Street, Test City, TS 12345',
         });
 
+      const body = response.body as ApiErrorResponse;
       expect(response.status).toBe(400);
-      expect(response.body.code).toBe('BAD_REQUEST');
+      expect(body.code).toBe('BAD_REQUEST');
     });
 
     it('should return 404 for non-existent product', async () => {
@@ -178,10 +164,15 @@ describe('Order API Integration Tests', () => {
         .get('/api/v1/orders')
         .set('Authorization', `Bearer ${authToken}`);
 
+      const body = response.body as ApiSuccessResponse<{
+        data: IOrder[];
+        pagination: { total: number; hasMore: boolean };
+      }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.data).toBeInstanceOf(Array);
-      expect(response.body.data.data.length).toBe(2);
-      expect(response.body.data.pagination.total).toBe(2);
+      expect(body.data?.data).toBeInstanceOf(Array);
+      expect(body.data?.data.length).toBe(2);
+      expect(body.data?.pagination.total).toBe(2);
     });
 
     it('should support pagination', async () => {
@@ -189,9 +180,14 @@ describe('Order API Integration Tests', () => {
         .get('/api/v1/orders?limit=1&offset=0')
         .set('Authorization', `Bearer ${authToken}`);
 
+      const body = response.body as ApiSuccessResponse<{
+        data: IOrder[];
+        pagination: { total: number; hasMore: boolean };
+      }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.data.length).toBe(1);
-      expect(response.body.data.pagination.hasMore).toBe(true);
+      expect(body.data?.data.length).toBe(1);
+      expect(body.data?.pagination.hasMore).toBe(true);
     });
   });
 
@@ -213,9 +209,11 @@ describe('Order API Integration Tests', () => {
         .get(`/api/v1/orders/${createdOrderId}`)
         .set('Authorization', `Bearer ${authToken}`);
 
+      const body = response.body as ApiSuccessResponse<{ order: IOrder }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.order.orderId).toBe(createdOrderId);
-      expect(response.body.data.order.totalAmount).toBe(99.99);
+      expect(body.data?.order.orderId).toBe(createdOrderId);
+      expect(body.data?.order.totalAmount).toBe(99.99);
     });
 
     it('should return 404 for non-existent order', async () => {
@@ -248,8 +246,10 @@ describe('Order API Integration Tests', () => {
           status: 'processing',
         });
 
+      const body = response.body as ApiSuccessResponse<{ order: IOrder }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.order.status).toBe('processing');
+      expect(body.data?.order.status).toBe('processing');
     });
 
     it('should return 400 for invalid status transition', async () => {
@@ -287,10 +287,6 @@ describe('Order API Integration Tests', () => {
       const response = await request(app)
         .post(`/api/v1/orders/${createdOrderId}/cancel`)
         .set('Authorization', `Bearer ${authToken}`);
-
-      console.log('STATUS:', response.status);
-      console.log('BODY:', response.body);
-      console.log('HEADERS:', response.headers);
 
       expect(response.status).toBe(200);
 

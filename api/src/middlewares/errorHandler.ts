@@ -11,12 +11,14 @@ import { logger } from '@/lib/winston';
 /**
  * Types
  */
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import {
   AppError,
   InternalServerError,
   ValidationError,
 } from '@/lib/api_response/error';
+import type { ParamsDictionary } from 'express-serve-static-core';
+
 
 /**
  * Global error handler middleware
@@ -88,10 +90,20 @@ export const errorHandler = (
  * Async handler wrapper
  * Wraps async route handlers to catch errors and pass them to error middleware
  */
-export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void> | void
-) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+export const asyncHandler = <
+  P = ParamsDictionary,
+  ResBody = unknown,
+  ReqBody = unknown,
+  // ReqQuery = ParsedQs
+>(
+  fn: (
+    req: Request<P, ResBody, ReqBody>,
+    res: Response<ResBody>,
+    next: NextFunction
+  ) => Promise<void> | void
+): RequestHandler<P, ResBody, ReqBody> => {
+  // We return a function that matches the signature, handling the Promise resolution
+  return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };

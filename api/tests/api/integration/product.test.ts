@@ -2,19 +2,28 @@ import 'reflect-metadata';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '@/app';
-import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
 import User from '@/models/user.model';
 import Product from '@/models/product.model';
 import { generateAccessToken } from '@/lib/jwt';
+import { ApiErrorResponse, ApiSuccessResponse } from '@/types';
+
+  interface TestProductDTO {
+  productId: string;
+  userId: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  status: string;
+}
 
 describe('Product API Integration Tests', () => {
   let authToken: string;
   let userId: string;
-  let createdProductId: string;
+  let createdProductId: string | undefined;
 
   beforeAll(async () => {
-    await connectToDatabase('Test-Product');
-
     // Create test user
     const testUser = await User.create({
       userId: 'test-product-user-123',
@@ -35,7 +44,6 @@ describe('Product API Integration Tests', () => {
   afterAll(async () => {
     await Product.deleteMany({ userId });
     await User.deleteMany({ userId });
-    await disconnectFromDatabase('Test-Product');
   });
 
   beforeEach(async () => {
@@ -55,13 +63,17 @@ describe('Product API Integration Tests', () => {
           stock: 50,
         });
 
-      expect(response.status).toBe(201);
-      expect(response.body.status).toBe('success');
-      expect(response.body.data.product).toHaveProperty('productId');
-      expect(response.body.data.product.name).toBe('Test Laptop');
-      expect(response.body.data.product.price).toBe(1299.99);
+      const body = response.body as ApiSuccessResponse<{
+        product: TestProductDTO;
+      }>;
 
-      createdProductId = response.body.data.product.productId;
+      expect(response.status).toBe(201);
+      expect(body.status).toBe('success');
+      expect(body.data?.product).toHaveProperty('productId');
+      expect(body.data?.product.name).toBe('Test Laptop');
+      expect(body.data?.product.price).toBe(1299.99);
+
+      createdProductId = body.data?.product.productId;
     });
 
     it('should return 400 for invalid product data', async () => {
@@ -76,20 +88,19 @@ describe('Product API Integration Tests', () => {
           stock: -5,
         });
 
+      const body = response.body as ApiErrorResponse;
       expect(response.status).toBe(400);
-      expect(response.body.status).toBe('error');
+      expect(body.status).toBe('error');
     });
 
     it('should return 401 without authentication token', async () => {
-      const response = await request(app)
-        .post('/api/v1/products')
-        .send({
-          name: 'Test Product',
-          description: 'Test Description',
-          price: 99.99,
-          category: 'electronics',
-          stock: 10,
-        });
+      const response = await request(app).post('/api/v1/products').send({
+        name: 'Test Product',
+        description: 'Test Description',
+        price: 99.99,
+        category: 'electronics',
+        stock: 10,
+      });
 
       expect(response.status).toBe(401);
     });
@@ -127,10 +138,20 @@ describe('Product API Integration Tests', () => {
         .get('/api/v1/products')
         .set('Authorization', `Bearer ${authToken}`);
 
+      const body = response.body as ApiSuccessResponse<{
+        data: TestProductDTO[];
+        pagination: {
+          total: number;
+          limit: number;
+          offset: number;
+          hasMore: boolean;
+        };
+      }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.data).toBeInstanceOf(Array);
-      expect(response.body.data.data.length).toBe(2);
-      expect(response.body.data.pagination).toHaveProperty('total');
+      expect(body.data?.data).toBeInstanceOf(Array);
+      expect(body.data?.data.length).toBe(2);
+      expect(body.data?.pagination).toHaveProperty('total');
     });
 
     it('should support pagination', async () => {
@@ -138,9 +159,19 @@ describe('Product API Integration Tests', () => {
         .get('/api/v1/products?limit=1&offset=0')
         .set('Authorization', `Bearer ${authToken}`);
 
+      const body = response.body as ApiSuccessResponse<{
+        data: TestProductDTO[];
+        pagination: {
+          total: number;
+          limit: number;
+          offset: number;
+          hasMore: boolean;
+        };
+      }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.data.length).toBe(1);
-      expect(response.body.data.pagination.hasMore).toBe(true);
+      expect(body.data?.data.length).toBe(1);
+      expect(body.data?.pagination.hasMore).toBe(true);
     });
   });
 
@@ -164,9 +195,19 @@ describe('Product API Integration Tests', () => {
         .get(`/api/v1/products/${createdProductId}`)
         .set('Authorization', `Bearer ${authToken}`);
 
+        const body = response.body as ApiSuccessResponse<{
+        product: TestProductDTO;
+        pagination: {
+          total: number;
+          limit: number;
+          offset: number;
+          hasMore: boolean;
+        };
+      }>;
+
       expect(response.status).toBe(200);
-      expect(response.body.data.product.productId).toBe(createdProductId);
-      expect(response.body.data.product.name).toBe('Single Product');
+      expect(body.data?.product.productId).toBe(createdProductId);
+      expect(body.data?.product.name).toBe('Single Product');
     });
 
     it('should return 404 for non-existent product', async () => {
@@ -202,9 +243,12 @@ describe('Product API Integration Tests', () => {
           stock: 15,
         });
 
+        const body = response.body as ApiSuccessResponse<{
+        product: TestProductDTO;
+      }>;
       expect(response.status).toBe(200);
-      expect(response.body.data.product.price).toBe(89.99);
-      expect(response.body.data.product.stock).toBe(15);
+      expect(body.data?.product.price).toBe(89.99);
+      expect(body.data?.product.stock).toBe(15);
     });
 
     it('should return 404 when updating non-existent product', async () => {
@@ -242,7 +286,9 @@ describe('Product API Integration Tests', () => {
       expect(response.status).toBe(204);
 
       // Verify product is deleted
-      const deletedProduct = await Product.findOne({ productId: createdProductId });
+      const deletedProduct = await Product.findOne({
+        productId: createdProductId,
+      });
       expect(deletedProduct).toBeNull();
     });
 

@@ -4,11 +4,11 @@
   "description": "Enterprise-grade Node.js API with TypeScript",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc && tsc-alias", 
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "start": "node dist/server.js",
     "dev": "nodemon --config nodemon.server.json",
     "test": "vitest run",
-    "test:watch": "jest --watch",
+    "test:watch": "vitest --watch",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },
