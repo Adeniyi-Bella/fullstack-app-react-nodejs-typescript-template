@@ -110,7 +110,9 @@ export interface IProductData {
   updatedAt: Date;
 }
 
-export type OrderItem = Pick<IProductData, 'productId' | 'name' | 'price'| "quantity">;
+export type ProductDataDTO = Omit<IProductData, 'quantity'>;
+
+export type OrderItem = Pick<IProductData, 'productId' | 'name' | 'price'| "quantity"> ;
 
 export type CreateProductDTO = Pick<
   IProductData,

@@ -2,7 +2,7 @@ import { injectable } from 'tsyringe';
 import Product, { IProduct } from '@/models/product.model';
 import { IProductService } from './product.interface';
 import {
-  IProductData,
+  ProductDataDTO,
   CreateProductDTO,
   UpdateProductDTO,
   PaginatedResponse,
@@ -17,7 +17,7 @@ import { randomUUID } from 'crypto';
 
 @injectable()
 export class ProductService implements IProductService {
-  private mapToDTO(product: IProduct): IProductData {
+  private mapToDTO(product: IProduct): ProductDataDTO {
     return {
       productId: product.productId,
       name: product.name,
@@ -32,7 +32,7 @@ export class ProductService implements IProductService {
     };
   }
 
-  async createProduct(userId: string, data: CreateProductDTO): Promise<IProductData> {
+  async createProduct(userId: string, data: CreateProductDTO): Promise<ProductDataDTO> {
     try {
       const product = await Product.create({
         productId: randomUUID(),
@@ -50,11 +50,11 @@ export class ProductService implements IProductService {
     }
   }
 
-  async getProductById(productId: string): Promise<IProductData | null> {
+  async getProductById(productId: string): Promise<ProductDataDTO | null> {
     try {
       const product = await Product.findOne({ productId })
         .select('-__v')
-        .lean<IProductData>()
+        .lean<ProductDataDTO>()
         .exec();
 
       if (!product) return null;
@@ -70,7 +70,7 @@ export class ProductService implements IProductService {
     userId: string,
     limit: number,
     offset: number
-  ): Promise<PaginatedResponse<IProductData>> {
+  ): Promise<PaginatedResponse<ProductDataDTO>> {
     try {
       const [products, total] = await Promise.all([
         Product.find({ userId })
@@ -78,7 +78,7 @@ export class ProductService implements IProductService {
           .limit(limit)
           .skip(offset)
           .select('-__v')
-          .lean<IProductData[]>()
+          .lean<ProductDataDTO[]>()
           .exec(),
         Product.countDocuments({ userId }).exec(),
       ]);
@@ -102,7 +102,7 @@ export class ProductService implements IProductService {
     userId: string,
     productId: string,
     data: UpdateProductDTO
-  ): Promise<IProductData | null> {
+  ): Promise<ProductDataDTO | null> {
     try {
       const product = await Product.findOneAndUpdate(
         { productId, userId },
