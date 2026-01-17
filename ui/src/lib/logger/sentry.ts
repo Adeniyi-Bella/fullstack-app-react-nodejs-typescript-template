@@ -1,16 +1,19 @@
 import * as Sentry from '@sentry/react';
+import type { AnyRouter } from '@tanstack/react-router';
 
 export class SentryLogger {
   private static initialized = false;
 
-  static init(): void {
+  static init(router: AnyRouter): void {
     if (this.initialized) return;
 
     const dsn = import.meta.env.VITE_SENTRY_DSN;
     const environment = import.meta.env.VITE_ENV || 'development';
 
     if (!dsn) {
-      console.warn('Sentry DSN not configured');
+      if (import.meta.env.DEV) {
+        console.warn('Sentry skipped: No DSN configured in .env');
+      }
       return;
     }
 
@@ -18,7 +21,7 @@ export class SentryLogger {
       dsn,
       environment,
       integrations: [
-         Sentry.browserTracingIntegration(),
+        Sentry.tanstackRouterBrowserTracingIntegration(router),
          Sentry.replayIntegration({
           maskAllText: false,
           blockAllMedia: false,
