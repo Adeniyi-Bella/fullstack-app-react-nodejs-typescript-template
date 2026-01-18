@@ -56,7 +56,7 @@ export const Login = memo(() => {
             <Input
               label="Password"
               type="password"
-              placeholder="••••••••"
+              placeholder="password"
               error={errors.password?.message}
               {...register("password", {
                 required: "Password is required",

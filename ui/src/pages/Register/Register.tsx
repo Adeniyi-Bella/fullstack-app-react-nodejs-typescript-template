@@ -48,6 +48,7 @@ export const Register = memo(() => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
               label="Username"
+              data-cy="username"
               placeholder="johndoe"
               error={errors.username?.message}
               {...formRegister("username", {

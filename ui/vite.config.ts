@@ -27,6 +27,7 @@ export default defineConfig({
     },
   },
   test: {
+    reporters: ["verbose"],
     globals: true,
     environment: "jsdom",
     setupFiles: "./tests/setup.ts",
