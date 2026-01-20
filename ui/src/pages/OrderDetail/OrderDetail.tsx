@@ -19,9 +19,10 @@ export const OrderDetail = memo(() => {
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateOrderStatus();
+  const isBusy = isUpdating || isCancelling;
 
   const handleCancel = useCallback(() => {
-    if (!order) return;
+    if (!order || isBusy) return;
     if (!confirm("Are you sure you want to cancel this order?")) return;
 
     cancelOrder(order.orderId, {
@@ -29,22 +30,21 @@ export const OrderDetail = memo(() => {
         navigate({ to: "/orders" });
       },
     });
-  }, [order, cancelOrder, navigate]);
+  }, [order, cancelOrder, navigate, isBusy]);
 
   const handleUpdateStatus = useCallback(
     (newStatus: OrderStatus) => {
-      if (!order) return;
-
+      if (!order || isBusy) return;
       updateStatus(
         { orderId: order.orderId, data: { status: newStatus } },
         {
           onSuccess: () => {
             // Order will be refetched automatically
           },
-        }
+        },
       );
     },
-    [order, updateStatus]
+    [order, updateStatus, isBusy],
   );
 
   const getStatusColor = (status: string) => {
@@ -98,7 +98,7 @@ export const OrderDetail = memo(() => {
           </div>
           <span
             className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize border ${getStatusColor(
-              order.status
+              order.status,
             )}`}
           >
             {order.status}
@@ -167,6 +167,7 @@ export const OrderDetail = memo(() => {
                   variant="primary"
                   onClick={() => handleUpdateStatus(OrderStatus.PROCESSING)}
                   isLoading={isUpdating}
+                  disabled={isBusy}
                 >
                   Mark as Processing
                 </Button>
@@ -174,6 +175,7 @@ export const OrderDetail = memo(() => {
                   variant="danger"
                   onClick={handleCancel}
                   isLoading={isCancelling}
+                  disabled={isBusy}
                 >
                   Cancel Order
                 </Button>

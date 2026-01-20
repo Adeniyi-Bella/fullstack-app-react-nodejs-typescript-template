@@ -23,6 +23,8 @@ export interface OrderDTO {
   updatedAt?: string;
 }
 
+export type TestOrderDTO = Omit<OrderDTO, 'userId' | 'updatedAt'>;
+
 export interface CreateOrderRequest {
   items: Array<{
     productId: string;
